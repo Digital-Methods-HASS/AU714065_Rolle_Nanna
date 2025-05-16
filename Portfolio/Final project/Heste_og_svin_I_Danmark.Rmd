@@ -1,0 +1,329 @@
+---
+title: "Heste og svin i Danmark 1937/8-1914"
+output: html_document
+author: Nanna Rolle and Aja Møller Jensen
+date: 'created on 9 Maj 2025, updated `r format(Sys.time(), "%d %B, %Y")`'
+---
+
+```{r inhentning af pakker,include=FALSE}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+install.packages("tidyverse")
+install.packages("ggplot2")
+library(tidyverse)
+library(ggplot2)
+
+```
+Indhentning af data: 
+Vi indhænter vores data. Vores data er et excel ark der er gemt som en CSV fil. Vi har et datasæt for heste, et for svin, et for heste pr. kvadrat mil og et for svin pr. kvadrat mil. Vi bruger funktionen 'read_csv2' da denne er en tidyverserunktion der kan fungere på kommasperert filer. 
+
+```{r, indhentning af data, include=FALSE}
+heste <- read_csv2("heste.csv", na="NA")
+
+svin <- read_csv2("svin.csv", na="NA")
+
+heste_kvadrat_mil <- read_csv2("heste_kvadratmil.csv", na="NA")
+
+svin_kvadrat_mil <- read_csv2("svin_kvadratmil.csv", na="NA")
+
+```
+ 
+
+```{r, indspisering af data, include=FALSE}
+heste
+
+svin
+
+heste_kvadrat_mil
+
+svin_kvadrat_mil
+```
+
+Generering af Dataframe: 
+Da vi gerne vil lave en visualisering med flere grafer i det samme koordinatsystem. Starter vi med at lave en dataframe, der indeholder dataen for hver af de grafer vi ønsker at visualisere. Det er for både svin og heste: kbh stad, Viborg amt, Maribo amt, Svendborg amt, Viborg amt, samt gennemsnittet for Danmark. 
+
+```{r, generering af dataframes, include=FALSE}
+svin_Kongeriget <- data.frame(x=c(svin$År),y=c(svin$`Hele kongeriget (kontrol)`))
+
+svin_Kbhstad <- data.frame(x=c(svin$År),y=c(svin$`Kbn stad`))
+
+svin_Viborg <- data.frame(x=c(svin$År),y=c(svin$Viborg))
+
+svin_Maribo <- data.frame(x=c(svin$År),y=c(svin$Maribo))
+
+svin_Svendborg <- data.frame(x=c(svin$År),y=c(svin$Svendborg))
+
+svin_Dk_gennemsnit <- data.frame(x=c(svin$År),y=c(svin$DK_Gennemsnit))
+
+svin_Ribe <- data.frame(x=c(svin$År),y=c(svin$Ribe))
+
+
+
+heste_Kongeriget <- data.frame(x=c(heste$År),y=c(heste$`Hele kongeriget (kontrol)`))
+
+heste_Kbhstad <- data.frame(x=c(heste$År),y=c(heste$`Kbn stad`))
+
+heste_Viborg <- data.frame(x=c(heste$År),y=c(heste$Viborg))
+
+heste_Maribo <- data.frame(x=c(heste$År),y=c(heste$Maribo))
+
+heste_Svendborg <- data.frame(x=c(heste$År),y=c(heste$Svendborg))
+
+heste_DK_gennemsnit <- data.frame(x=c(heste$År),y=c(heste$DK_Gennemsnit))
+
+heste_Ribe <- data.frame(x=c(heste$År),y=c(heste$Ribe))
+
+
+
+
+svin_Kbhstad_kvadrat_mil <- data.frame(x=c(svin_kvadrat_mil$År),y=c(svin_kvadrat_mil$`Kbn stad`))
+
+svin_Viborg_kvadrat_mil <- data.frame(x=c(svin_kvadrat_mil$År),y=c(svin_kvadrat_mil$Viborg))
+
+svin_Maribo_kvadrat_mil <- data.frame(x=c(svin_kvadrat_mil$År),y=c(svin_kvadrat_mil$Maribo))
+
+svin_Svendborg_kvadrat_mil <- data.frame(x=c(svin_kvadrat_mil$År),y=c(svin_kvadrat_mil$Svendborg))
+
+svin_Ribe_kvadrat_mil<- data.frame(x=c(svin_kvadrat_mil$År),y=c(svin_kvadrat_mil$Ribe))
+
+
+heste_Kbhstad_kvadrat_mil <- data.frame(x=c(heste_kvadrat_mil$År),y=c(heste_kvadrat_mil$`Kbn stad`))
+
+heste_Viborg_kvadrat_mil <- data.frame(x=c(heste_kvadrat_mil$År),y=c(heste_kvadrat_mil$Viborg))
+
+heste_Maribo_kvadrat_mil <- data.frame(x=c(heste_kvadrat_mil$År),y=c(heste_kvadrat_mil$Maribo))
+
+heste_Svendborg_kvadrat_mil <- data.frame(x=c(heste_kvadrat_mil$År),y=c(heste_kvadrat_mil$Svendborg))
+
+heste_Ribe_kvadrat_mil <- data.frame(x=c(heste_kvadrat_mil$År),y=c(heste_kvadrat_mil$Ribe))
+
+```
+
+Så putter vi de nye dataframes ind i en graf, der bliver til vores visualiseringer.  Vi ændre navnene på Y- og X-aksen, så det bliver mere intuitativt, samt giver grafen en overordnet overskrift. For at gøre visualiseringen nemmere at læse, ændre vi også på tykkelsen af grafernes-linje, ændre på intervallet på x-aksen, navngiver farvekoden: 'farvekode', og bestemmer farverne på hver graf, så det bliver gennemgårende gennem alle grafer. 
+Vi starter med at lave en graf (Graf1) for udviklingen af heste og svin i danmark fra 1837/38-1914. 
+
+```{r, Graf for Svin og heste, include=TRUE}
+Svin_og_heste <- ggplot(NULL,aes(x,y))+
+  geom_line(data=heste_Kongeriget,aes(color="Heste "),linewidth=1.2)+
+  geom_line(data=svin_Kongeriget,aes(color="Svin"),linewidth=1.2)+
+  labs(color = "Farvekode")+
+  xlab("Årstal")+
+  ylab("Antal dyr")+
+  ggtitle("Graf 1: Udvikling i antal heste og svin i Kongeriget Danmark 1837/8-1914")+
+  theme_bw()+
+  scale_x_continuous(breaks = seq(1838, 1914, by = 6))
+
+Svin_og_heste
+```
+
+Så laver vi en graf for udviklingen af svin i vores udvalgte landsdele i perioden 1937-1914 (graf 2)
+
+```{r, graf udvikling af svin, include=TRUE}
+Udvik_svin_dk <- ggplot(NULL,aes(x,y))+
+   geom_line(data=svin_Kbhstad,aes(color="KBH Stad"))+
+  geom_line(data=svin_Viborg,aes(color="Viborg amt"))+
+  geom_line(data=svin_Maribo,aes(color="Maribo amt"))+
+  geom_line(data=svin_Svendborg,aes(color="Svendborg amt"))+
+   geom_line(data=svin_Ribe,aes(color="Ribe amt"))+
+  geom_line(data=svin_Dk_gennemsnit,aes(color="Danmarks gennemsnit"))+
+  scale_color_manual(
+    values = c(
+      "KBH Stad" = "red",
+      "Viborg amt" = "blue",
+      "Maribo amt" = "green",
+      "Svendborg amt" = "purple",
+      "Ribe amt" = "orange",
+      "Danmarks gennemsnit"= "black"
+    )
+  ) +
+   labs(color = "Farvekode")+
+  xlab("Årstal")+
+  ylab("Antal svin")+
+  ggtitle("Graf 2: Udviklingen i antal svin i Danmark fra 1837-1914")+
+  theme_bw()+
+    scale_x_continuous(breaks = seq(1838, 1914, by = 6))
+
+Udvik_svin_dk
+```
+
+Så laver vi en graf for udviklingen af svin i  vores udvlagte landsdele fordelt pr. kvadrat mil i perioden(graf 3)
+
+```{r, udvikling i svin pr. kvadratmil, include=TRUE}
+Udvik_svin_kvadrat_mil <- ggplot(NULL,aes(x,y))+
+   geom_line(data=svin_Kbhstad_kvadrat_mil,aes(color="KBH Stad"),linewidth=1.1)+
+  geom_line(data=svin_Viborg_kvadrat_mil,aes(color="Viborg amt"),linewidth=1.1)+
+  geom_line(data=svin_Maribo_kvadrat_mil,aes(color="Maribo amt"),linewidth=1.1)+
+  geom_line(data=svin_Svendborg_kvadrat_mil,aes(color="Svendborg amt"),linewidth=1.1)+
+  geom_line(data=svin_Ribe_kvadrat_mil,aes(color="Ribe amt"),linewidth=1.1)+
+  scale_color_manual(
+    values = c(
+      "KBH Stad" = "red",
+      "Viborg amt" = "blue",
+      "Maribo amt" = "green",
+      "Svendborg amt" = "purple",
+      "Ribe amt" = "orange"
+    )
+  ) +
+    labs(color = "Farvekode")+
+  xlab("Årstal")+
+  ylab("Antal svin")+
+  ggtitle("Graf 3: Udviklingen i antal svin (pr. kvadrat mil) i Danmark fra 1837-1914 ")+
+  theme_bw()+
+   scale_x_continuous(breaks = seq(1838, 1914, by = 6))
+
+Udvik_svin_kvadrat_mil
+```
+
+Så laver vi en graf for udviklingen af heste i vores udvlagte landsdele i perioden 1838-1914 (graf 4)
+```{r,udvikling i heste, include=TRUE}
+Udvik_heste_dk <- ggplot(NULL,aes(x,y))+
+   geom_line(data=heste_Kbhstad,aes(color="KBH Stad"),linewidth=1.1)+
+  geom_line(data=heste_Viborg,aes(color="Viborg amt"),linewidth=1.1)+
+  geom_line(data=heste_Maribo,aes(color="Maribo amt"),linewidth=1.1)+
+  geom_line(data=heste_Svendborg,aes(color="Svendborg amt"),linewidth=1.1)+
+  geom_line(data=heste_Ribe,aes(color="Ribe amt"),linewidth=1.1)+
+  geom_line(data=heste_DK_gennemsnit,aes(color="Danmarks gennemsnit"),linewidth=1.1)+
+  scale_color_manual(
+    values = c(
+      "KBH Stad" = "red",
+      "Viborg amt" = "blue",
+      "Maribo amt" = "green",
+      "Svendborg amt" = "purple",
+      "Ribe amt" = "orange",
+      "Danmarks gennemsnit"= "black"
+    )
+  ) +
+  labs(color = "Farvekode")+
+  xlab("Årstal")+
+  ylab("Antal heste")+
+  ggtitle("Graf 4: Udviklingen i antal heste i Danmark fra 1838-1914")+
+  theme_bw()+
+   scale_x_continuous(breaks = seq(1838, 1914, by = 6))
+   
+ Udvik_heste_dk
+```
+
+Så laver vi en graf for udviklingen af heste i  vores udvlagte landsdele fordelt pr. kvadrat mil i perioden (graf 5)
+
+
+```{r, Udvikling i heste pr. kvadratmil, include=TRUE}
+Udvik_heste_kvadrat_mil <- ggplot(NULL, aes(x, y)) +
+  geom_line(data = heste_Kbhstad_kvadrat_mil, aes(color = "KBH Stad"), linewidth = 1.1) +
+  geom_line(data = heste_Viborg_kvadrat_mil, aes(color = "Viborg amt"), linewidth = 1.1) +
+  geom_line(data = heste_Maribo_kvadrat_mil, aes(color = "Maribo amt"), linewidth = 1.1) +
+  geom_line(data = heste_Svendborg_kvadrat_mil, aes(color = "Svendborg amt"), linewidth = 1.1) +
+  geom_line(data = heste_Ribe_kvadrat_mil, aes(color = "Ribe amt"), linewidth = 1.1) +
+  scale_color_manual(
+    values = c(
+      "KBH Stad" = "red",
+      "Viborg amt" = "blue",
+      "Maribo amt" = "green",
+      "Svendborg amt" = "purple",
+      "Ribe amt" = "orange"
+    )
+  ) +
+  labs(color = "Farvekode") +
+  xlab("Årstal") +
+  ylab("Antal heste") +
+  ggtitle("Graf 5: Udviklingen i antal heste (pr. kvadrat mil) i Danmark fra 1838-1914") +
+  theme_bw() +
+  scale_x_continuous(breaks = seq(1838, 1914, by = 6))
+  
+   
+ Udvik_heste_kvadrat_mil
+```
+
+For st gøre visualiseringerne endnu mere interessante for beskuren animere vi dem. Her starter vi med at installere nye 'pakker'. 
+
+Animeret graf; instalering af pakker
+
+```{r, installering af animeringspakker, include=FALSE}
+install.packages("gganimate")
+library(gganimate)
+
+install.packages("gifski")
+library(gifski)
+```
+
+Så starter vi med at lave en animeret graf for udviklingen i svin i Danmark i perioden. Her tager vi udgangs punkt i vores statiske graf 'Udvik_svin_dk' (Graf 2), og fortæller R at den skal bruge vores originale datamateriale 'svin.csv' og kolonnen 'År' i dette datasæt. Så beder vi R om at lave animationen og indstiller hastigheden på animationen, så vi syntes det giver det bedste udtryk for beskueren, og beder R gemme animationen. 
+
+Animeret graf for udviklingen i antal svin i Danmark i perioden ( Graf 2)
+
+```{r, animering af Graf 2, include=FALSE}
+animated_plot_svin_dk <- Udvik_svin_dk +
+  transition_reveal(svin$År) +
+  labs(title = 'Graf 2: Udvikling i antal svin')
+  
+Graf2_animated <- animate(animated_plot_svin_dk, nframes = 100, fps = 10, renderer = gifski_renderer())
+
+
+```
+
+
+```{r, visning af animeringen af graf 2, include=TRUE}
+Graf2_animated
+
+anim_save("Graf2_animated.gif", animation = Graf2_animated)
+```
+
+Her efter genbruger vi den samme kode, som ved animeringen af graf 2, men erstatter dataen med den der passer til graf 3, graf 4 og graf 5.
+
+Animeret graf for svin pr kvadrat mil (graf 3)
+
+```{r, animering af graf 3, include=FALSE}
+animated_plot_svin <- Udvik_svin_kvadrat_mil +
+  transition_reveal(svin_kvadrat_mil$År) +
+  labs(title = 'Graf 3: Udvikling i antal svin pr.kvadrat mil')
+  
+Graf3_animated <- animate(animated_plot_svin, nframes = 100, fps = 10, renderer = gifski_renderer())
+
+Graf3_animated
+
+anim_save("Graf3_animated.gif", animation = Graf3_animated)
+  
+```
+
+
+```{r, visning af animering af graf 3, include=TRUE}
+Graf3_animated
+
+anim_save("Graf3_animated.gif", animation = Graf3_animated)
+```
+
+Animeret graf for udviklingen i heste i dk i perioden (graf 4)
+
+```{r, animering af graf 4, include=FALSE}
+animated_plot_heste_dk <- Udvik_heste_dk +
+  transition_reveal(heste$År) +
+  labs(title = 'Graf 4: Udvikling i antal heste')
+  
+Graf4_animated <- animate(animated_plot_heste_dk, nframes = 100, fps = 10, renderer = gifski_renderer())
+
+
+```
+
+
+```{r, visning af animeringen af graf 4, include=TRUE}
+Graf4_animated
+
+anim_save("Graf4_animated.gif", animation = Graf4_animated)
+```
+
+
+Animeret graf for heste pr. kvadrat mil (graf 5)
+
+```{r, animering af graf 5, include=FALSE}
+animated_plot_heste <- Udvik_heste_kvadrat_mil +
+  transition_reveal(heste_kvadrat_mil$År) +
+  labs(title = 'Graf 5: Udvikling i antal heste pr.kvadrat mil')
+  
+Graf5_animated <- animate(animated_plot_heste, nframes = 100, fps = 10, renderer = gifski_renderer())
+
+```
+
+
+```{r, visening af animationen af graf 5, include=TRUE}
+Graf5_animated
+
+anim_save("Graf5_animated.gif", animation = Graf5_animated)
+```
+
